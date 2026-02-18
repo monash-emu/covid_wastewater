@@ -2,4 +2,7 @@
 # pixi environments
 .pixi
 *.egg-info
+
+# other files
 .ipynb_checkpoints/
+*.pyc
