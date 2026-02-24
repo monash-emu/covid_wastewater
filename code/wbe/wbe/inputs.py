@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from wbe.constants import DATA_PATH
+from wbe.constants import DATA_PATH, GROUP_VARS
 
 
 def get_cdc_wbe_data():
@@ -54,9 +54,6 @@ def split_concentration_var(
     return data
 
 
-group_vars = ["sewershed_id", "sample_collect_date"]
-
-
 def group_data(
     sample_type: str,
     data: pd.DataFrame,
@@ -65,17 +62,22 @@ def group_data(
 
     Args:
         sample_type: Whether liquid or solid
-        data:
+        data: The data split into solid or liquid
 
     Returns:
-        _description_
+        The grouped data
     """
+    data.sort_values(GROUP_VARS, inplace=True)
     grouped_obs = (
-        data.groupby(group_vars, as_index=False).agg(
+        data.groupby(GROUP_VARS, as_index=False).agg(
             pcr_conc=(f"{sample_type}_pcr_conc", "median"),
             n_raw_rows=(f"{sample_type}_pcr_conc", "size"),
+            jurisdict=("wwtp_jurisdiction", "last"),
+            fips=("county_fips", "last"),
+            pop=("population_served", "last"),
+            flow_rate=("flow_rate", "median"),
         )
-    ).sort_values(group_vars)
+    ).sort_values(GROUP_VARS)
     grouped_obs.index = grouped_obs["sample_collect_date"]
     cols = [c for c in grouped_obs.columns if c != "sample_collect_date"]
     return grouped_obs[cols]
