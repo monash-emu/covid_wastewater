@@ -77,4 +77,5 @@ def group_data(
         )
     ).sort_values(group_vars)
     grouped_obs.index = pd.to_datetime(grouped_obs["sample_collect_date"])
-    return grouped_obs
+    cols = [c for c in grouped_obs.columns if c != "sample_collect_date"]
+    return grouped_obs[cols]
