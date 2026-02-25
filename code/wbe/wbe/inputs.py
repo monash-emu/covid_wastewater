@@ -1,3 +1,5 @@
+import git
+from datetime import datetime, timezone
 import numpy as np
 import pandas as pd
 from wbe.constants import DATA_PATH, GROUP_VARS
@@ -12,7 +14,11 @@ def get_cdc_wbe_data():
     outdir = DATA_PATH / "wbe"
     DATA_PATH.mkdir(exist_ok=True)
     outdir.mkdir(exist_ok=True)
-    data.to_csv(outdir / "cdc_data.csv")
+    repo = git.Repo(search_parent_directories=True)
+    commit_id = repo.git.rev_parse("--short", "HEAD")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_t%H%M%S")
+    filename = f"cdc_data_d{ts}_sha{commit_id}.csv"
+    data.to_csv(outdir / filename)
 
 
 def split_concentration_var(
