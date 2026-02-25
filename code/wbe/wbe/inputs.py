@@ -75,7 +75,7 @@ def group_data(
             jurisdict=("wwtp_jurisdiction", "last"),
             fips=("county_fips", "last"),
             pop=("population_served", "last"),
-            flow_rate=("flow_rate", "median"),
+            flow_rate=("pcr_target_flowpop_lin", "median"),
         )
     ).sort_values(GROUP_VARS)
     grouped_obs.index = grouped_obs["sample_collect_date"]
