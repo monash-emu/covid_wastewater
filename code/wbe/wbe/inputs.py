@@ -21,6 +21,35 @@ def get_cdc_wbe_data():
     data.to_csv(outdir / filename)
 
 
+def get_jhu_surveillance_data(
+    ind: str,
+):
+    """Download and store the JHU surveillance data.
+
+    Args:
+        ind: Either confirmed or deaths to identify sheet
+    """
+    url = (
+        "https://github.com/CSSEGISandData/COVID-19/raw/refs/heads/master/"
+        "csse_covid_19_data/csse_covid_19_time_series/"
+        f"time_series_covid19_{ind}_US.csv"
+    )
+    data = pd.read_csv(url, dtype={"UID": str})
+    data.index = data["UID"]
+    date_cols = [c for c in data.columns if c.count("/") == 2]
+    data = data[date_cols]
+    data = data.T
+    data.index = pd.to_datetime(data.index, format="%m/%d/%y")
+    outdir = DATA_PATH / "jhu"
+    DATA_PATH.mkdir(exist_ok=True)
+    outdir.mkdir(exist_ok=True)
+    repo = git.Repo(search_parent_directories=True)
+    commit_id = repo.git.rev_parse("--short", "HEAD")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_t%H%M%S")
+    filename = f"jhu_{ind}_d{ts}_sha{commit_id}.csv"
+    data.to_csv(outdir / filename)
+
+
 def split_concentration_var(
     data: pd.DataFrame,
 ) -> pd.DataFrame:
