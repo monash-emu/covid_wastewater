@@ -56,6 +56,22 @@ def get_jhu_surveillance_data(
     data.to_csv(outdir / filename)
 
 
+def get_jhu_lookup():
+    """Download and store JHU UIP to FIPS lookup table."""
+    url = (
+        "https://github.com/CSSEGISandData/COVID-19/"
+        "raw/refs/heads/master/csse_covid_19_data/"
+        "UID_ISO_FIPS_LookUp_Table.csv"
+    )
+    lookup = pd.read_csv(url, index_col="UID", dtype={"FIPS": str})
+    lookup = lookup["FIPS"].dropna()
+    outdir = DATA_PATH / "jhu"
+    outdir.mkdir(exist_ok=True)
+    ts, commit_id = get_storage_metadata()
+    filename = f"fips_lookup_d{ts}_sha{commit_id}.csv"
+    lookup.to_csv(outdir / filename)
+
+
 def split_concentration_var(
     data: pd.DataFrame,
 ) -> pd.DataFrame:
